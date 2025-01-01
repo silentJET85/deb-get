@@ -6,4 +6,4 @@ if [ "${ACTION}" != "prettylist" ]; then
 fi
 PRETTY_NAME="Etcher"
 WEBSITE="https://www.balena.io/etcher/"
-SUMMARY="Flash OS images to SD cards & USB drives, safely and easily."
+SUMMARY="Flash OS images to SD cards & USB drives, safely and easily.test"
