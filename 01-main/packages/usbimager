@@ -6,4 +6,4 @@ if [ "${ACTION}" != "prettylist" ]; then
 fi
 PRETTY_NAME="USBImager"
 WEBSITE="https://bztsrc.gitlab.io/usbimager/"
-SUMMARY="A very minimal GUI app to write compressed images to USB sticks and create backups."
+SUMMARY="A very minimal GUI app to write compressed images to USB sticks and create backups.test123"
