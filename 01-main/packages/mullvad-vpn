@@ -7,4 +7,4 @@ if [ "${ACTION}" != "prettylist" ]; then
 fi
 PRETTY_NAME="Mullvad VPN Client"
 WEBSITE="https://mullvad.net/"
-SUMMARY="VPN Service based in Sweden that does not collect user data."
+SUMMARY="VPN Service based in Sweden that does not collect user data.test"
