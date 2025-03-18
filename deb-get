@@ -146,7 +146,8 @@ function create_etc_dir() {
 function unroll_url() {
     # Sourceforge started adding parameters
     local TRIM_URL="$(curl -w "%{url_effective}" -I -L -s -S "${1}" -o /dev/null)"
-    printf '%s' "${TRIM_URL/\.deb*/.deb}"
+    local FILENAME="${TRIM_URL##*/}"
+    printf '%s' "${TRIM_URL%/*}/${FILENAME%%\?*}"
 }
 
 function follow_url() {
@@ -176,8 +177,15 @@ function get_github_releases() {
             fi
             if [ ! ${APP} == "azuredatastudio" ]; then
                 # because MS have to be different
-                ${ELEVATE} sed -i '/browser_download/!d;/\.deb/!d' ${CACHE_FILE}
+                if grep "browser_download.*\.deb" "${CACHE_FILE}"; then
+                    # if there are no deb files listed, grab the zip and tar files instead.
+                    # for the rare instances where there are deb files contained within.
+                    ${ELEVATE} sed -i '/browser_download/!d;/\.deb/!d' ${CACHE_FILE}
+                else
+                    ${ELEVATE} sed -i '/browser_download/!d;/\.zip\|\.tar/!d' ${CACHE_FILE}
+                fi
             fi
+
         fi
     fi
 }
@@ -210,9 +218,16 @@ function get_gitlab_releases() {
                 local URL="${GITLAB_HOST}/api/v4/projects/${GITLAB_PROJECT//\//%2F}/releases"
             fi
             wgetcmdarray=(wget -q --no-use-server-timestamps "${URL}" -O- )
-            # Only grab the .deb files URLs, but first add newlines, because the JSON is all on one line.
+            # Only grab the asset URLs, but first add newlines, because the JSON is all on one line.
             # This will make it easier for packages to use sed or grep, instead of needing to use jq.
-            "${wgetcmdarray[@]}" | sed -E 's/(\"direct_asset_url\")/\n\1/g; s/(\",)/\1\n/g' | sed -E '/direct_asset_url/!d;/\.deb/!d; s/.*(http.*\.deb).*/\1/' | ${ELEVATE} tee "${CACHE_FILE}" > /dev/null || ( fancy_message warn "Updating ${CACHE_FILE} failed." )
+            "${wgetcmdarray[@]}" | sed -E 's/(\"direct_asset_url\")/\n\1/g; s/(\",)/\1\n/g' | ${ELEVATE} tee "${CACHE_FILE}" > /dev/null || ( fancy_message warn "Updating ${CACHE_FILE} failed." )
+            if grep "direct_asset_url.*\.deb" "${CACHE_FILE}"; then
+                # if there are no deb files listed, grab the zip and tar files instead.
+                # for the rare instances where there are deb files contained within.
+                ${ELEVATE} sed -i -E '/direct_asset_url/!d;/\.deb/!d; s/.*(http.*\.deb).*/\1/' "${CACHE_FILE}"
+            else
+                ${ELEVATE} sed -i -E '/direct_asset_url/!d;/\.zip|\.tar/!d; s/.*(http.*\.[^"]*).*/\1/' "${CACHE_FILE}"
+            fi
         fi
     fi
 }
@@ -349,6 +364,13 @@ function install_deb() {
         if ! download_deb "${URL}" "${FILE}"; then
             return
         fi
+        case "${FILE}" in
+             *.zip) FILE=$(extract_zip "${FILE}" | tail -n 1);;
+            *.tar*) FILE=$(extract_tar "${FILE}" | tail -n 1);;
+        esac
+        if [ ! -f "${CACHE_DIR}"/"${FILE}" ]; then
+            return
+        fi
         if ! ${ELEVATE} apt-get -q=2 -o Dpkg::Progress-Fancy="1" -y install "${CACHE_DIR}/${FILE}"; then
             return
         fi
@@ -359,11 +381,25 @@ function install_deb() {
             if ! download_deb "${URL}" "${FILE}"; then
                 return
             fi
+            case "${FILE}" in
+                 *.zip) FILE=$(extract_zip "${FILE}" | tail -n 1);;
+                *.tar*) FILE=$(extract_tar "${FILE}" | tail -n 1);;
+            esac
+            if [ ! -f "${CACHE_DIR}"/"${FILE}" ]; then
+                return
+            fi
             if ! ${ELEVATE} apt-get -q=2 -o Dpkg::Progress-Fancy="1" -y --reinstall --allow-downgrades install "${CACHE_DIR}/${FILE}"; then
                 return
             fi
         elif dpkg --compare-versions "${VERSION_PUBLISHED}" gt "${VERSION_INSTALLED}"; then
             if ! download_deb "${URL}" "${FILE}"; then
+                return
+            fi
+            case "${FILE}" in
+                 *.zip) FILE=$(extract_zip "${FILE}" | tail -n 1);;
+                *.tar*) FILE=$(extract_tar "${FILE}" | tail -n 1);;
+            esac
+            if [ ! -f "${CACHE_DIR}"/"${FILE}" ]; then
                 return
             fi
             if ! ${ELEVATE} apt-get -q=2 -o Dpkg::Progress-Fancy="1" -y install "${CACHE_DIR}/${FILE}"; then
@@ -676,6 +712,42 @@ function upgrade_debs() {
             fi
         fi
     done
+}
+
+function extract_zip() {
+    local FILE="${1}"
+    local EXTRACTED_FILE="$(zipinfo -1 "${CACHE_DIR}/${FILE}" | grep -m 1 \.deb)"
+    if [ -z "$EXTRACTED_FILE" ]; then
+        fancy_message error "Failed to find any deb packages in the zip file. Deleting ${CACHE_DIR}/${FILE}..." | tee /dev/tty
+        ${ELEVATE} rm "${CACHE_DIR}/${FILE}" 2>/dev/null
+        return 1
+    fi
+    fancy_message info "Extracting zip archive." | tee /dev/tty
+    if ! ${ELEVATE} unzip -j -o "${CACHE_DIR}/${FILE}" "${EXTRACTED_FILE}" -d "${CACHE_DIR}"; then
+        fancy_message error "Failed to extract ${FILE}. Deleting ${CACHE_DIR}/${FILE}..." | tee /dev/tty
+        ${ELEVATE} rm "${CACHE_DIR}/${FILE}" 2>/dev/null
+        return 1
+    fi
+    ${ELEVATE} rm "${CACHE_DIR}/${FILE}" 2>/dev/null
+    echo "${EXTRACTED_FILE##*/}"
+}
+
+function extract_tar() {
+    local FILE="${1}"
+    local EXTRACTED_FILE="$(tar --list --file "${CACHE_DIR}/${FILE}" | grep -m 1 \.deb)"
+    if [ -z "$EXTRACTED_FILE" ]; then
+        fancy_message error "Failed to find any deb packages in the tarball file. Deleting ${CACHE_DIR}/${FILE}..." | tee /dev/tty
+        ${ELEVATE} rm "${CACHE_DIR}/${FILE}" 2>/dev/null
+        return 1
+    fi
+    fancy_message info "Extracting tar archive." | tee /dev/tty
+    if ! ${ELEVATE} tar --directory "${CACHE_DIR}" --file "${CACHE_DIR}/${FILE}" --extract "${EXTRACTED_FILE}" --overwrite --transform='s|.*/||'; then
+        fancy_message error "Failed to extract ${FILE}. Deleting ${CACHE_DIR}/${FILE}..." | tee /dev/tty
+        ${ELEVATE} rm "${CACHE_DIR}/${FILE}" 2>/dev/null
+        return 1
+    fi
+    ${ELEVATE} rm "${CACHE_DIR}/${FILE}" 2>/dev/null
+    echo "${EXTRACTED_FILE##*/}"
 }
 
 function init_repos() {
@@ -1411,6 +1483,8 @@ function dg_action_clean() {
         ${ELEVATE} rm -fv "${CACHE_DIR}"/*.json*
         ${ELEVATE} rm -fv "${CACHE_DIR}"/*.html
         ${ELEVATE} rm -fv "${CACHE_DIR}"/*.txt
+        ${ELEVATE} rm -fv "${CACHE_DIR}"/*.zip
+        ${ELEVATE} rm -fv "${CACHE_DIR}"/*.tar*
 
 }
 function dg_action_show() {
