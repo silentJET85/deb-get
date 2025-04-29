@@ -92,9 +92,7 @@ body:
     attributes:
       value: |
         &nbsp;
-        ```bash
-        deb-get update
-        ```
+        `deb-get update`
   - type: textarea
     id: update
     attributes:
