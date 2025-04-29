@@ -41,13 +41,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        <br>
-        <br>
-        <br>
+        &nbsp;
+        &nbsp;
+        &nbsp;
         ### System information
         Run the following commands and paste the output below:
-        <br>
-        <br>
+        &nbsp;
+        &nbsp;
         ```bash
         cat /etc/os-release
         ```
