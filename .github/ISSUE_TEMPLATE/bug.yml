@@ -45,7 +45,8 @@ body:
         <br>
         ### System information
         Run the following commands and paste the output below:
-
+        <br>
+        <br>
         ```bash
         cat /etc/os-release
         ```
