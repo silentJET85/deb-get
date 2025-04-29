@@ -1,0 +1,16 @@
+name: New Feature
+description: Request a new feature to be added to deb-get.
+title: "Feature Request: "
+labels: ["bug"]
+body:
+- type: markdown
+  attributes:
+    value: "## Requesting a new feature 🧑‍💻"
+- type: textarea
+  id: new-feature
+  attributes:
+    label: New Feature
+    description: "If you are proposing a new feature for `deb-get` please describe the proposed feature with as much detail as possible here:"
+    render: markdown
+  validations:
+    required: true
