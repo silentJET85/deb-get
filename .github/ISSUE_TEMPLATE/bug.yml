@@ -15,21 +15,20 @@ body:
         ```
         &nbsp;
         &nbsp;
-        &nbsp;
   - type: textarea
     id: expected-behavior
     attributes:
       label: Expected Behavior
       placeholder: Describe the expected behavior here.
     validations:
-      required: false
+      required: true
   - type: textarea
     id: actual-behavior
     attributes:
       label: Actual Behavior
       placeholder: Describe the actual behavior here.
     validations:
-      required: false
+      required: true
   - type: textarea
     id: steps-to-reproduce
     attributes:
