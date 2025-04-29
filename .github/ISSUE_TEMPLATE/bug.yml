@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a problem with deb-get..
+description: Report a problem with deb-get.
 title: "Bug: "
 labels: ["bug"]
 body:
@@ -56,7 +56,6 @@ body:
       placeholder: Paste the contents of your /etc/os-release file here.
     validations:
       required: false
-
   - type: markdown
     attributes:
       value: |
@@ -87,12 +86,13 @@ body:
       placeholder: The version number of deb-get that you are running.
     validations:
       required: false
-
   - type: markdown
     attributes:
       value: |
         &nbsp;
-        `deb-get update`
+        ```bash
+        deb-get update
+        ```
   - type: textarea
     id: update
     attributes:
@@ -100,13 +100,11 @@ body:
       placeholder: Paste the output from updating deb-get.
     validations:
       required: false
-      
   - type: markdown
     attributes:
       value: |
         &nbsp;
         &nbsp;
-
   - type: textarea
     id: more-info
     attributes:
