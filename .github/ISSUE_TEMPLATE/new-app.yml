@@ -1,12 +1,14 @@
 name: New App
 description: Request a new app/package to be added to deb-get.
 title: "App Request: "
-labels: ["new package"]
+labels: ["new package", "good first issue"]
 body:
   - type: markdown
     attributes:
       value: |
         ## Requesting a new app ✨
+        Thank you for taking the time to report an issue to the deb-get project 🙂
+
         If you are requesting a new app to be added to `deb-get` please complete the following sections, only one app per issue please.
 
   - type: checkboxes
