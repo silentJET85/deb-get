@@ -8,9 +8,7 @@ body:
       value: |
         ## Reporting a bug 🐛
         Thank you for taking the time to report an issue to the deb-get project 🙂
-
         Please make sure the version of `deb-get` you are using is up to date:
-
         ```bash
         deb-get update
         deb-get reinstall deb-get
