@@ -102,6 +102,12 @@ body:
       placeholder: Paste the output from updating deb-get.
     validations:
       required: false
+      
+  - type: markdown
+    attributes:
+      value: |
+        &nbsp;
+        &nbsp;
 
   - type: textarea
     id: more-info
