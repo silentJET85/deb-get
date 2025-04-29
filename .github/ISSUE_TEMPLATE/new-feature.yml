@@ -7,6 +7,8 @@ body:
   attributes:
     value: |
       ## Requesting a new feature 🧑‍💻
+      Thank you for taking the time to report an issue to the deb-get project 🙂
+
       Please describe the proposed feature with as much detail as possible:
 - type: textarea
   id: new-feature
