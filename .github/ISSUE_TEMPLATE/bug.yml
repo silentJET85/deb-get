@@ -13,9 +13,10 @@ body:
         deb-get update
         deb-get reinstall deb-get
         ```
-        <br>
-        <br>
-        <br> 
+        &nbsp;
+        &nbsp;
+        &nbsp;
+        &nbsp;
   - type: textarea
     id: expected-behavior
     attributes:
