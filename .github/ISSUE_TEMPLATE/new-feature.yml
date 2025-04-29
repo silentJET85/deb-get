@@ -6,8 +6,8 @@ body:
 - type: markdown
   attributes:
     value: |
-      "## Requesting a new feature 🧑‍💻"
-      "Please describe the proposed feature with as much detail as possible here:"
+      ## Requesting a new feature 🧑‍💻
+      Please describe the proposed feature with as much detail as possible:
 - type: textarea
   id: new-feature
   attributes:
