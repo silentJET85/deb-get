@@ -51,6 +51,8 @@ body:
         ```bash
         cat /etc/os-release
         ```
+        &nbsp;
+        &nbsp;
   - type: textarea
     id: os-release
     attributes:
@@ -65,6 +67,8 @@ body:
         ```bash
         cat /etc/lsb-release
         ```
+        &nbsp;
+        &nbsp;
   - type: textarea
     id: lsb-release
     attributes:
@@ -72,13 +76,14 @@ body:
       placeholder: Paste the contents of your /etc/lsb-release file here.
     validations:
       required: false
-
   - type: markdown
     attributes:
       value: |
         ```bash
         deb-get version
         ```
+        &nbsp;
+        &nbsp;
   - type: textarea
     id: version
     attributes:
@@ -93,6 +98,8 @@ body:
         ```bash
         deb-get update
         ```
+        &nbsp;
+        &nbsp;
   - type: textarea
     id: update
     attributes:
