@@ -39,13 +39,3 @@ body:
       label: App Summary
     validations:
       required: true
-
-
-
-
-
-
-      - App Name:
- - Download URL:
- - Website URL:
- - App Summary:
