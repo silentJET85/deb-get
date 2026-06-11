@@ -7,3 +7,4 @@ fi
 PRETTY_NAME="FinDeb"
 WEBSITE="https://github.com/DerLinke/FinDeb"
 SUMMARY="The Universal Package Manager Wrapper"
+# a comment so the file is changed, and I can retrigger the CI with a force push
