@@ -1551,7 +1551,7 @@ function dg_action_install() {
                     fancy_message fatal "${APP} is not supported on ${HOST_ARCH}."
                 fi
 
-                if [ -n "${CODENAMES_SUPPORTED}" ] && ! [[ " ${CODENAMES_SUPPORTED[*]} " =~ " ${UPSTREAM_CODENAME} " ]]; then
+                if [ -n "${CODENAMES_SUPPORTED}" ] && ! [[ " ${CODENAMES_SUPPORTED[*]} " =~ " ${UPSTREAM_CODENAME} " ]] && [[ "${GITHUB_WORKFLOW}" != "📦 Package Tests" ]]; then
                     fancy_message fatal "${APP} is not supported on ${OS_ID_PRETTY} ${UPSTREAM_CODENAME^}."
                 fi
 
