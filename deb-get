@@ -634,7 +634,7 @@ function list_debs() {
             # because we need to update the cache files this one slow time
             for FULL_APP in "${APPS[@]}"; do
                 if validate_deb "${FULL_APP}"; then
-                    if [[ " ${ARCHS_SUPPORTED} " =~ (" ${HOST_ARCH} "|" all ") ]] && { [ -z "${CODENAMES_SUPPORTED}" ] || [[ " ${CODENAMES_SUPPORTED} " =~ " ${UPSTREAM_CODENAME} " ]]; } && { [ "${METHOD}" != ppa ] || [ "${UPSTREAM_ID}" == ubuntu ]; }; then
+                    if [[ " ${ARCHS_SUPPORTED} " =~ (" ${HOST_ARCH} "|" all ") ]] && { [ -z "${CODENAMES_SUPPORTED}" ] || [[ " ${CODENAMES_SUPPORTED} " =~ " ${UPSTREAM_CODENAME} " ]] || [[ "${GITHUB_WORKFLOW}" == "📦 Package Tests" ]]; } && { [ "${METHOD}" != ppa ] || [ "${UPSTREAM_ID}" == ubuntu ]; }; then
                         case "${2}" in
                         (--raw)
                             printf '%s\n' "${APP}"
